@@ -6,6 +6,8 @@ TagManager:
   tags:
   - soldier
   - camera
+  - w_shotgun
+  - bala
   layers:
   - Default
   - TransparentFX

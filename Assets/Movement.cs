@@ -9,10 +9,13 @@ public class Movement : MonoBehaviour
     float cameraRot;
     float vel;
 
+    
 
 
     bool active;
     bool move;
+    bool shoot;
+    bool gunOut = false;
     bool hasActivated = false;
 
 
@@ -33,6 +36,10 @@ public class Movement : MonoBehaviour
     private float distPerc;
 
     Animator anim;
+    GameObject gun;
+    public GameObject balita;
+
+    float bulletSpeed = 100f;
 
     // Start is called before the first frame update
     void Start()
@@ -44,6 +51,8 @@ public class Movement : MonoBehaviour
         this.initZ = this.gameObject.transform.position.z;
         this.currX = this.gameObject.transform.position.x;
         this.currZ = this.gameObject.transform.position.z;
+        gun = this.transform.Find("Bip001").gameObject.transform.Find("Bip001 Pelvis").gameObject.transform.Find("Bip001 Spine").gameObject.transform.Find("Bip001 R Clavicle").gameObject.transform.Find("Bip001 R UpperArm").gameObject.transform.Find("Bip001 R Forearm").gameObject.transform.Find("Bip001 R Hand").gameObject.transform.Find("R_hand_container").gameObject.transform.Find("w_shotgun").gameObject;
+                  
     }
 
     // Update is called once per frame
@@ -95,6 +104,39 @@ public class Movement : MonoBehaviour
             {
                 anim.SetTrigger("wave");
             }
+
+            if (Input.GetKeyDown(KeyCode.Z))
+            {
+                if(!gunOut){
+                   anim.SetTrigger("gunO"); 
+                   gun.SetActive(true);
+                    gunOut = true;
+                    anim.SetBool("gunOut", true);
+                }else{
+                    gun.SetActive(false);
+                    gunOut = false;
+                    anim.SetBool("gunOut", false);
+                }
+            }
+
+            if (Input.GetKeyDown(KeyCode.X))
+            {
+                if(gunOut){
+                GameObject disparo = Instantiate(balita,this.transform.Find("brazo").gameObject.transform.position,this.transform.Find("brazo").gameObject.transform.rotation);
+                Rigidbody rigDisparo = disparo.GetComponent<Rigidbody>();
+                rigDisparo.AddForce(transform.forward * bulletSpeed);
+                Destroy(disparo,3);
+                 }
+                anim.SetTrigger("shoot");
+            }
+        }
+    }
+
+    public void OnTriggerEnter(Collider collisionInfo)
+    {
+        if(collisionInfo.gameObject.tag == "bala"){
+            Destroy(collisionInfo.gameObject);
+            Debug.Log("Pum");
         }
     }
 
