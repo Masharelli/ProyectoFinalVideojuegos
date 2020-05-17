@@ -37,9 +37,11 @@ public class Movement : MonoBehaviour
 
     Animator anim;
     GameObject gun;
-    public GameObject balita;
+    Camera camera;
+    public RawImage aimcross;
+    float probabilidadDeDsiparo;
 
-    float bulletSpeed = 100f;
+
 
     // Start is called before the first frame update
     void Start()
@@ -52,7 +54,8 @@ public class Movement : MonoBehaviour
         this.currX = this.gameObject.transform.position.x;
         this.currZ = this.gameObject.transform.position.z;
         gun = this.transform.Find("Bip001").gameObject.transform.Find("Bip001 Pelvis").gameObject.transform.Find("Bip001 Spine").gameObject.transform.Find("Bip001 R Clavicle").gameObject.transform.Find("Bip001 R UpperArm").gameObject.transform.Find("Bip001 R Forearm").gameObject.transform.Find("Bip001 R Hand").gameObject.transform.Find("R_hand_container").gameObject.transform.Find("w_shotgun").gameObject;
-                  
+        camera = this.transform.Find("cam").gameObject.GetComponent<Camera>();    
+        aimcross.enabled = false;  
     }
 
     // Update is called once per frame
@@ -110,10 +113,12 @@ public class Movement : MonoBehaviour
                 if(!gunOut){
                    anim.SetTrigger("gunO"); 
                    gun.SetActive(true);
+                   aimcross.enabled = true;
                     gunOut = true;
                     anim.SetBool("gunOut", true);
                 }else{
                     gun.SetActive(false);
+                    aimcross.enabled = false;
                     gunOut = false;
                     anim.SetBool("gunOut", false);
                 }
@@ -122,23 +127,30 @@ public class Movement : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.X))
             {
                 if(gunOut){
-                GameObject disparo = Instantiate(balita,this.transform.Find("brazo").gameObject.transform.position,this.transform.Find("brazo").gameObject.transform.rotation);
-                Rigidbody rigDisparo = disparo.GetComponent<Rigidbody>();
-                rigDisparo.AddForce(transform.forward * bulletSpeed);
-                Destroy(disparo,3);
+                    var ray = camera.ScreenPointToRay(Input.mousePosition);
+                    RaycastHit hit;
+                    if(Physics.Raycast(ray, out hit)){
+                        if(hit.transform.gameObject.tag == "soldier"){
+                            probabilidadDeDsiparo = Random.Range(0,100);
+                            if(probabilidadDeDsiparo>40){
+                                Debug.Log("Disparo acertado a " + hit.transform.gameObject.tag);
+                                Animator hitAnim = hit.transform.GetComponent<Animator>();
+                                hitAnim.SetTrigger("damage");
+
+                            }else{
+                                Debug.Log("Disparo fallado");
+                            }
+                        }
+                       
+                       
+
+                    }
                  }
                 anim.SetTrigger("shoot");
             }
         }
     }
 
-    public void OnTriggerEnter(Collider collisionInfo)
-    {
-        if(collisionInfo.gameObject.tag == "bala"){
-            Destroy(collisionInfo.gameObject);
-            Debug.Log("Pum");
-        }
-    }
 
     public void activate(){
         active = true;
