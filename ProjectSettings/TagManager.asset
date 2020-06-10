@@ -6,6 +6,11 @@ TagManager:
   tags:
   - soldier
   - camera
+  - w_shotgun
+  - bala
+  - soldierP1
+  - soldierP2
+  - healthpack
   layers:
   - Default
   - TransparentFX
